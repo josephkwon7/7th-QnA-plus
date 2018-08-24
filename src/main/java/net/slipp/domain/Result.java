@@ -25,4 +25,10 @@ public class Result {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
+
+	@Override
+	public String toString() {
+		return "Result [valid=" + valid + ", errorMessage=" + errorMessage + "]";
+	}
+	
 }

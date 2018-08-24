@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import net.slipp.domain.AnswerRepository;
 import net.slipp.domain.Question;
+import net.slipp.domain.QuestionRepository;
 import net.slipp.domain.Result;
 import net.slipp.domain.User;
 
@@ -93,6 +94,7 @@ public class QuestionController {
 	public String delete(@PathVariable Long id, Model model, HttpSession session) {
 		Question question = questionRepository.getOne(id);
 		Result result = valid(session, question);
+		System.out.println(result);
 		if (!result.isValid()) {
 			model.addAttribute("errorMessage", result.getErrorMessage());
 			return "/user/login";

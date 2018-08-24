@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.slipp.domain.Answer;
 import net.slipp.domain.AnswerRepository;
 import net.slipp.domain.Question;
+import net.slipp.domain.QuestionRepository;
 import net.slipp.domain.Result;
 import net.slipp.domain.User;
 
@@ -34,6 +36,16 @@ public class ApiAnswerController {
 		Question question = questionRepository.getOne(questionId);
 		Answer answer = new Answer(loginUser, question, content);
 		question.addAnswer();
+		return answerRepository.save(answer);
+	}
+	
+	@PutMapping("/{id}")
+	public Answer update(@PathVariable Long questionId, @PathVariable Long id, String content, HttpSession session) {
+		if (!HttpSessionUtils.isLoginUser(session)) {
+			return null;
+		}
+		Answer answer = answerRepository.getOne(id);
+		answer.updateAnswer(content);
 		return answerRepository.save(answer);
 	}
 	

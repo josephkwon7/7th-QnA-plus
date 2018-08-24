@@ -44,4 +44,8 @@ public class Answer extends AbstractEntity {
 		return "Answer [" + super.toString() + ", writer=" + writer + ", question=" + question + ", content=" + content + "]";
 	}
 
+	public void updateAnswer(String content) {
+		this.content = content;
+	}
+
 }

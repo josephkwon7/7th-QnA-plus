@@ -81,4 +81,8 @@ public class Question extends AbstractEntity {
 				+ countOfAnswer + "]";
 	}
 
+	public Integer getCountOfAnswer() {
+		return countOfAnswer;
+	}
+
 }

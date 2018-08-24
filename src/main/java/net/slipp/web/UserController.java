@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import net.slipp.domain.Question;
+import net.slipp.domain.Result;
 import net.slipp.domain.User;
 import net.slipp.domain.UserRepository;
 
@@ -71,38 +73,37 @@ public class UserController {
 
 	@GetMapping("/{id}/form")
 	public String updateForm(@PathVariable Long id, Model model, HttpSession session) {
-		if (!HttpSessionUtils.isLoginUser(session)) {
-			System.out.println("로그인한 사용자만 수정할 수 있습니다.");
-			return "redirect:/users/loginForm";
-		}
-		
-		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
-		if (!sessionedUser.matchId(id)) {
-			throw new IllegalStateException("You can not update the another user.");
-		}
-		
 		User user = userRepository.getOne(id);
-		System.out.println("user : " + user);
+		Result result = valid(session, user);
+		if (!result.isValid()) {
+			model.addAttribute("errorMessage", result.getErrorMessage());
+			return "/user/login";
+		}
 		model.addAttribute("user", user);
 		return "/user/updateForm";
 	}
 	
 	@PutMapping("/{id}")
-	public String update(@PathVariable Long id, User updatedUser, HttpSession session) {
-		if (!HttpSessionUtils.isLoginUser(session)) {
-			System.out.println("로그인한 사용자만 수정할 수 있습니다.");
-			return "redirect:/users/loginForm";
-		}
-		
-		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
-		if (!sessionedUser.matchId(id)) {
-			throw new IllegalStateException("You can not update the another user.");
-		}
-		
+	public String update(@PathVariable Long id, User updatedUser, HttpSession session, Model model) {
 		User user = userRepository.getOne(id);
+		Result result = valid(session, user);
+		if (!result.isValid()) {
+			model.addAttribute("errorMessage", result.getErrorMessage());
+			return "/user/login";
+		}
 		user.update(updatedUser);
 		userRepository.save(user);	
 		return "redirect:/users";
 	}
 	
+	private Result valid(HttpSession session, User user) {
+		if (!HttpSessionUtils.isLoginUser(session)) {
+			return Result.fail("로그인이 필요합니다.");
+		}
+		User loginUser = HttpSessionUtils.getUserFromSession(session);
+		if (!user.equals(loginUser)) {
+			return Result.fail("본인의 정보만 수정이 가능 합니다.");
+		}
+		return Result.ok();
+	}
 }
